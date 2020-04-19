@@ -5,6 +5,7 @@ namespace common\extend;
 
 
 
+use PHPExcel;
 use PHPExcel_IOFactory;
 
 /**
@@ -47,5 +48,36 @@ class OfficesTool
         } else {
             yield false;
         }
+    }
+
+
+    public static  function exportData($header, $doc, $file, $title, $type='Excel5')
+    {
+        $objExcel = new PHPExcel();
+        $objWriter = PHPExcel_IOFactory::createWriter($objExcel, $type);
+        $objActSheet = $objExcel->getActiveSheet(0);
+        $objActSheet->setTitle($title); //设置excel的标题
+        foreach ($header as $k => $v) {
+            $objActSheet->setCellValue($k, $v);
+        }
+
+        $baseRow = 2; //数据从N-1行开始往下输出 这里是避免头信息被覆盖
+        //默认数据
+        $aKeys = array_keys($header);
+        foreach ($doc as $key => $value) {
+            $i = $baseRow + $key;
+            foreach ($value as  $k => $cell_val) {
+                $objExcel->getActiveSheet()->setCellValue(substr($aKeys[$k], 0 , 1).$i, $cell_val);
+            }
+        }
+
+
+        $objExcel->setActiveSheetIndex(0);
+        //4、输出
+        $objExcel->setActiveSheetIndex();
+        header('Content-Type: applicationnd.ms-excel');
+        header("Content-Disposition: attachment;filename=" . $file);
+        header('Cache-Control: max-age=0');
+        $objWriter->save('php://output');
     }
 }

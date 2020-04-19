@@ -35,7 +35,7 @@ class BaseActiveRecord extends ActiveRecord
     public $start_time;
     public $stop_time;
     public $timePoint;
-    public $operator;
+    //public $operator;
     public $flag; //是否超管
     public $baseModel;
     public $_mgrName;

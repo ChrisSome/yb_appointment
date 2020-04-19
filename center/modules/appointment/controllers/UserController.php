@@ -21,9 +21,9 @@ class UserController extends ValidateController
         $params = Yii::$app->request->queryParams;
         $params['showField'] = $model->default_field;
         $query = UserAppointment::find();
-        $pagesSize = isset($params['offset']) ? $params['offset'] : 20; // 每页条数
+        $pagesSize = isset($params['offset']) ? ($params['offset'] ? $params['offset'] : 20) : 20; // 每页条数
         foreach ($params as $k => $v) {
-            if (!empty($v) &&  array_key_exists($k, $model->getSearchField())) {
+            if ((!empty($v) || preg_match('/^0$/', $v)) &&  array_key_exists($k, $model->getSearchField())) {
                 switch ($k) {
                     case 'start_time':
                         $query->andWhere('created_at >= :start', [':start' => strtotime($v)]);
@@ -99,4 +99,86 @@ class UserController extends ValidateController
         return $this->redirect('index');
     }
 
+    /**
+     * 查看
+     * @param $id
+     * @return string|\yii\web\Response
+     */
+    public function actionView($id) {
+        $model = UserAppointment::findOne($id);
+        if (!$model) {
+            Yii::$app->getSession()->setFlash('success', '对象不存在');
+
+            return $this->redirect('index');
+        }
+
+
+        return $this->render('view', [
+            'model' => $model
+        ]);
+    }
+
+
+    /**
+     * 操作
+     * @param $id
+     * @return string|\yii\web\Response
+     */
+    public function actionOperate($id)
+    {
+        $model = UserAppointment::findOne($id);
+        $iChgStatus = Yii::$app->request->get('status');
+        $sRemark = Yii::$app->request->get('remark', '');
+        if (!$model) {
+            Yii::$app->getSession()->setFlash('success', '对象不存在');
+
+            return $this->redirect('index');
+        }
+        //将当前记录保存在临时旧数据
+        $model->_temOldAttr = $model->getCurrentData();
+        if (Yii::$app->request->isPost) {
+            $model->status = $iChgStatus;
+            $model->remark = $sRemark;
+            if ($model->save(false)) {
+                Yii::$app->getSession()->setFlash('success', '操作成功');
+            } else {
+                var_dump($model->getErrors());EXIT;
+                Yii::$app->getSession()->setFlash('success', '操作失败');
+            }
+
+            return $this->redirect('index');
+        } else {
+            return $this->renderAjax('reason');
+        }
+    }
+
+
+    /**
+     * 批量操作
+     * @return \yii\web\Response
+     * @throws \yii\db\Exception
+     */
+    public function actionBatch()
+    {
+        $params = Yii::$app->request->queryParams;
+        $ids = $params['ids'];
+        $id_arr = explode(',', $ids);
+        $status = $params['status'];
+        $remark = $params['remark'];
+        $model = new UserAppointment();
+        $rs = Yii::$app->db->createCommand()->update(
+            UserAppointment::tableName(),
+            ['status' => $status, 'remark' => $remark, 'updated_at' => time(), 'operator' => $model->getMgrName()],
+            ['id' => $id_arr]
+        )->execute();
+        if ($rs) {
+            Yii::$app->getSession()->setFlash('success', '操作成功');
+        } else {
+            Yii::$app->getSession()->setFlash('success', '操作失败');
+        }
+
+        $model->batchLog($params);
+
+        return  $this->redirect('index');
+    }
 }

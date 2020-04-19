@@ -35,7 +35,10 @@ return [
                     'appointment/import-mobile/operate',
                     'appointment/import-mobile/preview',
                 ],
-                'appointment/user/index',
+                'appointment/user/index' => [
+                    'appointment/user/operate',
+                    'appointment/user/batch',
+                ],
                 'appointment/domain/index' => [
                     'appointment/domain/create',
                     'appointment/domain/update',

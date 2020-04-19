@@ -64,7 +64,7 @@ class AppointmentController extends ApiController
             exit(204);
         }
 
-        if (!$this->checkDomain()) {
+        if (!$this->checkDomain() && false) {
             return self::returnJson(403, [
                 'code' => 403,
                 'message' => '别瞎闹'
@@ -94,9 +94,17 @@ class AppointmentController extends ApiController
             ]);
         }
         $model = $this->model;
-        $aHasAlreadyBindPhones = $model->getHasBindAlreadyPhone();
+        //$aHasAlreadyBindPhones = $model->getHasBindAlreadyPhone();
         //var_dump($aHasAlreadyBindPhones, in_array($sPhone, $aHasAlreadyBindPhones));exit;
-        if (in_array($sPhone, $aHasAlreadyBindPhones)) {
+        if ($model_one = UserAppointment::findOne(['mobile' => $sPhone])) {
+            if ($model_one->status == 2) {
+
+                return self::returnJson(407, [
+                    'code' => 407,
+                    'message' => ' 返回您的号码被限制, 请联系客服'
+                ]);
+            }
+
             return self::returnJson(406, [
                 'code' => 406,
                 'message' => '很抱歉， 您已预约'

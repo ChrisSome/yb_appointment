@@ -403,5 +403,8 @@ return [
     'status' => '状态',
     'goBack' => '返回',
     'operate type domain manage' => '域名',
+    'operate type User Appointment' => '用户预约状态',
+    'appointment/user/operate' => '审核',
+    'appointment/user/batch' => '批量审核',
 
 ];

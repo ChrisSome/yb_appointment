@@ -8,11 +8,12 @@
 </head>
 <body>
 
-<form action="/api/appointment/apply" method="post" onsubmit="return false;">
+<form action="/api/appointment/apply" method="post" onsubmit="return getSign();">
     手机号： <input type="text" name="mobile" id="mobile"/>
     <input type="hidden" name="sign" id="sign"/>
     用户名: <input type="text" name="username" id="username"/>
 
+    <input type="submit" value="确认"/>
 </form>
 <span class="button" style="border: 1px solid red; cursor: pointer">提交</span>
 
@@ -26,6 +27,8 @@
         var _mobile = document.getElementById('mobile').value;
         var _safe_str = 'mobile='+_mobile+'&username='+_username;
         document.getElementById('sign').value = hex_md5(_safe_str);
+
+        return true;
         var _sign = $('#sign').val();
         $.ajax({
             //请求方式

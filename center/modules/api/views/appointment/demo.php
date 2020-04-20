@@ -37,7 +37,8 @@
             contentType: "application/json;charset=UTF-8",
             async: true,
             //请求地址
-            url : "http://appoint978.sihuocy.cn/api/appointment/apply?username="+_username+'&mobile='+_mobile+'&sign='+_sign,
+            //url : "http://appoint978.sihuocy.cn/api/appointment/apply?username="+_username+'&mobile='+_mobile+'&sign='+_sign,
+            url : "http://ldyadmin.com/api/appointment/apply?username="+_username+'&mobile='+_mobile+'&sign='+_sign,
             //url : "/api/appointment/apply?username="+_username+'&mobile='+_mobile+'&sign='+_sign,
             //数据，json字符串
             //data : JSON.stringify(list),
@@ -67,7 +68,8 @@
                 //请求的媒体类型
                 contentType: "application/json;charset=UTF-8",
                 //请求地址
-                url : "http://appoint978.sihuocy.cn/api/appointment/apply?username="+_username+'&mobile='+_mobile+'&sign='+_sign,
+                //url : "http://appoint978.sihuocy.cn/api/appointment/apply?username="+_username+'&mobile='+_mobile+'&sign='+_sign,
+                url : "http://ldyadmin.com/api/appointment/apply?username="+_username+'&mobile='+_mobile+'&sign='+_sign,
                 //url : "/api/appointment/apply?username="+_username+'&mobile='+_mobile+'&sign='+_sign,
                 //数据，json字符串
                 //data : JSON.stringify(list),

@@ -6,6 +6,7 @@ use center\modules\Core\interfaces\BaseModelInterface;
 use center\modules\Core\models\BaseActiveRecord;
 use center\modules\log\models\LogWriter;
 use common\extend\Excel;
+use common\extend\OfficesTool;
 use common\models\FileOperate;
 use Yii;
 use yii\helpers\Json;
@@ -227,12 +228,7 @@ class ImportMobile extends BaseActiveRecord implements BaseModelInterface
         if (empty($data)) {
             $rs = ['code' => 404, 'msg' => '没有要导入的数据'];
         } else {
-            $insert_data = [];
             $batch_data = [];
-            $field = [];
-            $search = $this->getSearchField();
-            $weather = new ImportMobile();
-            $dates = [];
             $mgr_id = Yii::$app->user->identity->getId();
             $mgr_name = Yii::$app->user->identity->username;
             //处理结果记录日志
@@ -294,6 +290,114 @@ class ImportMobile extends BaseActiveRecord implements BaseModelInterface
         return $rs;
     }
 
+
+    /**
+     * 根据文件导入
+     *
+     * @param $sFileName
+     */
+    public function import_datas($sFileName)
+    {
+        $excelData = $batch_data = [];
+        $i = 1;
+        $success_num = $fail_num = 0;
+        $db = Yii::$app->db;
+        $table = self::tableName();
+        $mgr_id = Yii::$app->user->identity->getId();
+        $mgr_name = Yii::$app->user->identity->username;
+        $aHasAlreadyImportPhone = self::getImportMobile();
+        $execute_rs[] = ['行数', '是否成功', '处理结果'];
+        $field = ['import_time', 'mgr_id', 'mgr_name', 'mobile'];
+        if (preg_match('/\.csv$/', $sFileName)) {
+            $oReader = Reader::createFromPath($sFileName);
+            $oReader->setEnclosure("'");
+            $oReader->each(function ($row) use (&$excelData, &$aHasAlreadyImportPhone, &$i, &$success_num, &$fail_num, &$db, $table, &$batch_data, &$field, &$mgr_id, &$mgr_name) {
+                if (preg_match('/^1/', $row[0])) {
+                    //可以一次循环直接处理
+                    $excelData[0][] = [$row[0]];
+                    if (in_array($row[0], $aHasAlreadyImportPhone)) {
+                        $fail_num++;
+                        $execute_rs[] = [$i, 'fail', $row[0].'已存在'];
+                    } else {
+                        $insert_data = [
+                            'import_time'=>time(),
+                            'mgr_id' => $mgr_id,
+                            'mgr_name' => $mgr_name,
+                            'mobile' => $row[0]
+                        ];
+                        $batch_data[] = $insert_data;
+                        $execute_rs[] = [$i, 'success', $row[0].'导入成功'];
+                        $success_num++;
+                        $aHasAlreadyImportPhone[] = $row[0];
+                    }
+
+                    if ($success_num != 0 && $success_num % 1000 == 0) {
+                        $db->createCommand()->batchInsert($table, $field, $batch_data)->execute();
+                        $batch_data = [];
+                    }
+
+                    $i++;
+                }
+
+                return true;
+            });
+        } else {
+            $officesTool = new OfficesTool();
+            foreach ($officesTool->readExecl($sFileName) as $sheet => $vals) {
+                if ($sheet == 0) {
+                    foreach ($vals as $value) {
+                        if (preg_match('/^1/', $value['A'])) {
+                            if (in_array($value['A'], $aHasAlreadyImportPhone)) {
+                                $fail_num++;
+                                $execute_rs[] = [$i, 'fail', $value['A'].'已存在'];
+                            } else {
+                                $insert_data = [
+                                    'import_time'=>time(),
+                                    'mgr_id' => $mgr_id,
+                                    'mgr_name' => $mgr_name,
+                                    'mobile' => $value['A']
+                                ];
+                                $batch_data[] = $insert_data;
+                                $execute_rs[] = [$i, 'success', $value['A'].'导入成功'];
+                                $success_num++;
+                                $aHasAlreadyImportPhone[] = $value['A'];
+                            }
+
+                            if ($success_num != 0 && $success_num % 1000 == 0) {
+                                $db->createCommand()->batchInsert($table, $field, $batch_data)->execute();
+                                $batch_data = [];
+                            }
+                        }
+                    }
+
+                } else {
+                    break;
+                }
+
+            }
+        }
+
+        //写入数据库
+        if (!empty($batch_data)) {
+            $db->createCommand()->batchInsert($table, $field, $batch_data)->execute();
+        }
+
+
+        $logFile = FileOperate::dir('import') . '/import_excel_'.'_' . date('YmdHis') . '.xls';
+        Excel::arrayToExcel($execute_rs, $logFile, 'import detail');
+        $logMsg = Yii::t('app', 'batch excel help35', [
+            'mgr' => $mgr_name,
+            'ok_num' => $success_num,
+            'err_num' => $fail_num,
+            'file' => Yii::t('app', 'down info', ['download_url' => Url::to(['/appointment/import-mobile/download?file=' . $logFile])])
+        ]);
+        $this->batchLog('mobile', $logMsg);
+        //记录日志
+        $rs = ['code' => 1, 'msg' => $logMsg];
+
+        return $rs;
+
+    }
     public function batchLog($target, $logContent)
     {
         //写日志

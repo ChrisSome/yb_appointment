@@ -358,6 +358,7 @@ return [
     'batch excel help7' => 'excel文件上传失败，请重试',
     'batch excel help24' => '1，预览数据只显示前10条<br />2，检查导入的参数及数据是否符合预期，如果不符合预期请取消操作并检查文件<br />3，确认后数据开始导入，操作不可逆转<br />',
     'batch excel help35' => '{mgr} 批量导入 完成，导入成功 {ok_num} 个，失败 {err_num} 个,  操作结果 : {file}',
+    //'batch excel help35' => '{mgr} 批量导入 完成，导入成功 {ok_num} 个，失败 {err_num} 个',
     'down info' => '详情请<a href="{download_url}">点此下载Excel文件</a>',
 
     'username' => '用户名',

@@ -185,7 +185,7 @@ class ImportMobileController extends ValidateController
         } else {
             Yii::$app->getSession()->setFlash('error', Yii::t('app', 'batch excel help7'));
 
-            return $this->redirect('import');
+            return $this->redirect('index');
         }
 
         if (preg_match('/\.csv$/', $newFileName)) {
@@ -237,7 +237,9 @@ class ImportMobileController extends ValidateController
 
     public function actionOperate()
     {
-        $post = Yii::$app->request->post();
+        set_time_limit(0);
+        ini_set('memory_limit', '2048M');
+        //$post = Yii::$app->request->post();
         $error = '';
         $db = Yii::$app->db;
         $trans = $db->beginTransaction();
@@ -246,34 +248,12 @@ class ImportMobileController extends ValidateController
             $model = new ImportMobile();
             $session = Yii::$app->session->get('batch_excel_import');
             $sFileName = $session['fileName'];
-            if (preg_match('/\.csv$/', $sFileName)) {
-                $oReader = Reader::createFromPath($sFileName);
-                $oReader->setEnclosure("'");
 
-                $excelData = [];
-                $oReader->each(function ($row) use (&$excelData) {
-                    if (preg_match('/^1/', $row[0])) {
-                        $excelData[0][] = [$row[0]];
-                    }
+            $rs = $model->import_datas($sFileName);
 
-                    return true;
-                });
-            } else if (preg_match('/\.xlsx$/', $sFileName)) {
-                $excelData = [];
-                $officesTool = new OfficesTool();
-                foreach ($officesTool->readExecl($sFileName) as $sheet => $vals) {
-                    if ($sheet == 0) {
-                        $excelData[0] = $vals;
-                    }
 
-                }
-            } else {
-                $excelData = Excel::set_file($sFileName);
-            }
-
-            $model->excelData = $excelData[0]; //excel 数据
             /*调用模板发送短信*/
-            $rs = $model->import_data();
+            //$rs = $model->import_data();
             if ($rs['code'] != 1) {
                 $error = $rs['msg'];
             } else {

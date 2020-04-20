@@ -381,4 +381,12 @@ $attributes = $model->getAttributesList();
 
         return ids;
     }
+
+    $(document).on('click', '#all', function () {
+        var _status = document.getElementById('all').checked;
+        var checkBoxes = document.getElementsByName('id[]');
+        for(var i = 0;i<checkBoxes.length;i++){
+            checkBoxes[i].checked = _status;
+        }
+    })
 </script>

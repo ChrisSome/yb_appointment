@@ -105,9 +105,9 @@ class IpManageController extends ValidateController
         $post = Yii::$app->request->post();
         if ($post && $model->load($post) && $model->validate()) {
             if ( $model->save()) {
-                Yii::$app->getSession()->setFlash('success', '添加域名成功');
+                Yii::$app->getSession()->setFlash('success', '添加ip成功');
             } else {
-                Yii::$app->getSession()->setFlash('success', '添加域名失败');
+                Yii::$app->getSession()->setFlash('success', '添加ip失败');
             }
 
             return $this->redirect('index');
@@ -134,9 +134,9 @@ class IpManageController extends ValidateController
         $post = Yii::$app->request->post();
         if ($post && $model->load($post) && $model->validate()) {
             if ( $model->save()) {
-                Yii::$app->getSession()->setFlash('success', '编辑域名成功');
+                Yii::$app->getSession()->setFlash('success', '编辑ip成功');
             } else {
-                Yii::$app->getSession()->setFlash('success', '编辑域名失败');
+                Yii::$app->getSession()->setFlash('success', '编辑ip失败');
             }
 
             return $this->redirect('index');

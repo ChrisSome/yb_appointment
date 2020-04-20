@@ -24,7 +24,7 @@ use League\Csv\Reader;
  */
 class ImportMobile extends BaseActiveRecord implements BaseModelInterface
 {
-    public $default_field = ['id', 'mobile', 'mgr_name','import_time',];
+    public $default_field = ['id', 'mobile', 'mgr_name', 'import_time',];
     public $file;
     public $start_time;
     public $stop_time;
@@ -68,10 +68,10 @@ class ImportMobile extends BaseActiveRecord implements BaseModelInterface
     {
         return [
             'id' => 'ID',
-            'mobile' =>  Yii::t('app', 'Mobile'),
-            'import_time' =>  Yii::t('app', 'Import Time'),
-            'mgr_id' =>  Yii::t('app', 'Mgr ID'),
-            'mgr_name' =>  Yii::t('app', 'Mgr Name'),
+            'mobile' => Yii::t('app', 'Mobile'),
+            'import_time' => Yii::t('app', 'Import Time'),
+            'mgr_id' => Yii::t('app', 'Mgr ID'),
+            'mgr_name' => Yii::t('app', 'Mgr Name'),
         ];
     }
 
@@ -83,10 +83,10 @@ class ImportMobile extends BaseActiveRecord implements BaseModelInterface
     {
         return [
             'id' => 'ID',
-            'mobile' =>  Yii::t('app', 'Mobile'),
-            'import_time' =>  Yii::t('app', 'Import Time'),
-            'mgr_id' =>  Yii::t('app', 'Mgr ID'),
-            'mgr_name' =>  Yii::t('app', 'Mgr Name'),
+            'mobile' => Yii::t('app', 'Mobile'),
+            'import_time' => Yii::t('app', 'Import Time'),
+            'mgr_id' => Yii::t('app', 'Mgr ID'),
+            'mgr_name' => Yii::t('app', 'Mgr Name'),
         ];
     }
 
@@ -131,10 +131,10 @@ class ImportMobile extends BaseActiveRecord implements BaseModelInterface
 
         $this->_searchField = [
             'id' => 'ID',
-            'mobile' =>  Yii::t('app', 'Mobile'),
-            'import_time' =>  Yii::t('app', 'Import Time'),
-            'mgr_id' =>  Yii::t('app', 'Mgr ID'),
-            'mgr_name' =>  Yii::t('app', 'Mgr Name'),
+            'mobile' => Yii::t('app', 'Mobile'),
+            'import_time' => Yii::t('app', 'Import Time'),
+            'mgr_id' => Yii::t('app', 'Mgr ID'),
+            'mgr_name' => Yii::t('app', 'Mgr Name'),
             'start_time' => Yii::t('app', 'start opt time'),
             'stop_time' => Yii::t('app', 'end opt time'),
         ];
@@ -195,11 +195,11 @@ class ImportMobile extends BaseActiveRecord implements BaseModelInterface
     {
         //获取扩展字段
         $normalField = yii\helpers\ArrayHelper::merge([
-           'mobile', 'mgr_name'
+            'mobile', 'mgr_name'
         ], []);
 
 
-        return  [
+        return [
             'mobile' => $this->mobile,
             'mgr_name' => $this->mgr_name
         ];
@@ -214,6 +214,7 @@ class ImportMobile extends BaseActiveRecord implements BaseModelInterface
     {
         return self::find()->select('mobile')->column();
     }
+
     public $excelData = [];
 
     /**
@@ -239,7 +240,7 @@ class ImportMobile extends BaseActiveRecord implements BaseModelInterface
             $hasAlreadyImportMobile = self::getImportMobile();
             //var_dump($hasAlreadyImportMobile);exit;
             $success_num = $fail_num = 0;
-            $logFile = FileOperate::dir('import') . '/import_excel_'.'_' . date('YmdHis') . '.xls';
+            $logFile = FileOperate::dir('import') . '/import_excel_' . '_' . date('YmdHis') . '.xls';
             //var_dump($hasAlreadyImportMobile, $data);exit;
             foreach ($data as $line => $v) {
                 $v[0] = isset($v['A']) ? $v['A'] : $v[0];
@@ -250,19 +251,19 @@ class ImportMobile extends BaseActiveRecord implements BaseModelInterface
                         $batch_data = [];
                     }
                     $insert_data = [
-                        'import_time'=>time(),
+                        'import_time' => time(),
                         'mgr_id' => $mgr_id,
                         'mgr_name' => $mgr_name,
                         'mobile' => $v[0]
                     ];
                     $hasAlreadyImportMobile[] = $v[0];
-                    $execute_rs[] = [$line, 'success', $v[0].'导入成功'];
+                    $execute_rs[] = [$line, 'success', $v[0] . '导入成功'];
                     $success_num++;
 
                     //防止excel日志里面重复手机号码
                     $batch_data[] = $insert_data;
                 } else {
-                    $execute_rs[] = [$line, 'fail', $v[0].'已存在'];
+                    $execute_rs[] = [$line, 'fail', $v[0] . '已存在'];
                     $fail_num++;
                 }
 
@@ -290,6 +291,31 @@ class ImportMobile extends BaseActiveRecord implements BaseModelInterface
         return $rs;
     }
 
+    public function getPhones($sFileName)
+    {
+        if (preg_match('/\.csv$/', $sFileName)) {
+            # code...
+            $handle = fopen($sFileName, 'rb');
+
+            while (feof($handle) === false) {
+                # code...
+                yield fgets($handle);
+            }
+
+            fclose($handle);
+        } else {
+            $officesTool = new OfficesTool();
+            foreach ($officesTool->readExecl($sFileName) as $sheet => $vals) {
+                if ($sheet == 0) {
+                    foreach ($vals as $value) {
+                        yield $value['A'];
+                    }
+                } else {
+                    break;
+                }
+            }
+        }
+    }
 
     /**
      * 根据文件导入
@@ -298,8 +324,7 @@ class ImportMobile extends BaseActiveRecord implements BaseModelInterface
      */
     public function import_datas($sFileName)
     {
-        $excelData = $batch_data = [];
-        $i = 1;
+        $batch_data = [];
         $success_num = $fail_num = 0;
         $db = Yii::$app->db;
         $table = self::tableName();
@@ -308,72 +333,26 @@ class ImportMobile extends BaseActiveRecord implements BaseModelInterface
         $aHasAlreadyImportPhone = self::getImportMobile();
         $execute_rs[] = ['行数', '是否成功', '处理结果'];
         $field = ['import_time', 'mgr_id', 'mgr_name', 'mobile'];
-        if (preg_match('/\.csv$/', $sFileName)) {
-            $oReader = Reader::createFromPath($sFileName);
-            $oReader->setEnclosure("'");
-            $oReader->each(function ($row) use (&$excelData, &$aHasAlreadyImportPhone, &$i, &$success_num, &$fail_num, &$db, $table, &$batch_data, &$field, &$mgr_id, &$mgr_name) {
-                if (preg_match('/^1/', $row[0])) {
-                    //可以一次循环直接处理
-                    $excelData[0][] = [$row[0]];
-                    if (in_array($row[0], $aHasAlreadyImportPhone)) {
-                        $fail_num++;
-                        $execute_rs[] = [$i, 'fail', $row[0].'已存在'];
-                    } else {
-                        $insert_data = [
-                            'import_time'=>time(),
-                            'mgr_id' => $mgr_id,
-                            'mgr_name' => $mgr_name,
-                            'mobile' => $row[0]
-                        ];
-                        $batch_data[] = $insert_data;
-                        $execute_rs[] = [$i, 'success', $row[0].'导入成功'];
-                        $success_num++;
-                        $aHasAlreadyImportPhone[] = $row[0];
-                    }
-
-                    if ($success_num != 0 && $success_num % 1000 == 0) {
-                        $db->createCommand()->batchInsert($table, $field, $batch_data)->execute();
-                        $batch_data = [];
-                    }
-
-                    $i++;
+        foreach ($this->getPhones($sFileName) as $line => $phone) {
+            $phone = trim($phone);
+            if (!empty($phone) && preg_match('/^1/', $phone) && !in_array($phone, $aHasAlreadyImportPhone)) {
+                if ($success_num != 0 && $success_num % 1000 == 0) {
+                    $db->createCommand()->batchInsert($table, $field, $batch_data)->execute();
+                    $batch_data = [];
                 }
-
-                return true;
-            });
-        } else {
-            $officesTool = new OfficesTool();
-            foreach ($officesTool->readExecl($sFileName) as $sheet => $vals) {
-                if ($sheet == 0) {
-                    foreach ($vals as $value) {
-                        if (preg_match('/^1/', $value['A'])) {
-                            if (in_array($value['A'], $aHasAlreadyImportPhone)) {
-                                $fail_num++;
-                                $execute_rs[] = [$i, 'fail', $value['A'].'已存在'];
-                            } else {
-                                $insert_data = [
-                                    'import_time'=>time(),
-                                    'mgr_id' => $mgr_id,
-                                    'mgr_name' => $mgr_name,
-                                    'mobile' => $value['A']
-                                ];
-                                $batch_data[] = $insert_data;
-                                $execute_rs[] = [$i, 'success', $value['A'].'导入成功'];
-                                $success_num++;
-                                $aHasAlreadyImportPhone[] = $value['A'];
-                            }
-
-                            if ($success_num != 0 && $success_num % 1000 == 0) {
-                                $db->createCommand()->batchInsert($table, $field, $batch_data)->execute();
-                                $batch_data = [];
-                            }
-                        }
-                    }
-
-                } else {
-                    break;
-                }
-
+                $aHasAlreadyImportPhone[] = $phone;
+                $insert_data = [
+                    'import_time' => time(),
+                    'mgr_id' => $mgr_id,
+                    'mgr_name' => $mgr_name,
+                    'mobile' => $phone
+                ];
+                $success_num++;
+                $batch_data[] = $insert_data;
+                $execute_rs[] = [$line + 1, 'success', $phone . '导入成功'];
+            } else {
+                $fail_num++;
+                $execute_rs[] = [$line + 1, 'fail', $phone . '已经存在'];
             }
         }
 
@@ -383,7 +362,7 @@ class ImportMobile extends BaseActiveRecord implements BaseModelInterface
         }
 
 
-        $logFile = FileOperate::dir('import') . '/import_excel_'.'_' . date('YmdHis') . '.xls';
+        $logFile = FileOperate::dir('import') . '/import_excel_' . '_' . date('YmdHis') . '.xls';
         Excel::arrayToExcel($execute_rs, $logFile, 'import detail');
         $logMsg = Yii::t('app', 'batch excel help35', [
             'mgr' => $mgr_name,
@@ -398,6 +377,7 @@ class ImportMobile extends BaseActiveRecord implements BaseModelInterface
         return $rs;
 
     }
+
     public function batchLog($target, $logContent)
     {
         //写日志

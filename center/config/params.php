@@ -44,6 +44,11 @@ return [
                     'appointment/domain/update',
                     'appointment/domain/chg-status',
                 ],
+                'appointment/ip-manage/index' => [
+                    'appointment/ip-manage/create',
+                    'appointment/ip-manage/update',
+                    'appointment/ip-manage/delete',
+                ],
             ],
         ],
         //设置

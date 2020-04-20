@@ -4,6 +4,7 @@ namespace center\modules\api\controllers;
 
 
 use center\modules\appointment\models\DomainManager;
+use center\modules\appointment\models\IpBlacklist;
 use center\modules\appointment\models\UserAppointments;
 use Yii;
 use common\models\Redis;
@@ -153,6 +154,36 @@ class AppointmentController extends ApiController
     public function actionDemo()
     {
         return $this->renderPartial('demo');
+    }
+
+
+    /**
+     * 验证ip是否为黑名单
+     * @return \yii\web\Response
+     */
+    public function actionIpIsBlack()
+    {
+        if (!$this->checkDomain()) {
+            return self::returnJson(403, [
+                'code' => 403,
+                'message' => '别瞎闹'
+            ]);
+        }
+        $ip = Yii::$app->request->userIP;
+        $ipLong = ip2long($ip);
+
+        if (IpBlacklist::findOne(['ip_addr' => $ipLong])) {
+            return self::returnJson(403, [
+                'code' => 403,
+                'message' => $ip.'在黑名单'
+            ]);
+        } else {
+            return self::returnJson(200, [
+                'code' => 200,
+                'message' => $ip.'可以正常访问'
+            ]);
+        }
+
     }
 
 }

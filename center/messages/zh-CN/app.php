@@ -408,4 +408,11 @@ return [
     'appointment/user/operate' => '审核',
     'appointment/user/batch' => '批量审核',
 
+
+    'appointment/ip-manage/create' => '增加',
+    'appointment/ip-manage/update' => '编辑',
+    'appointment/ip-manage/delete' => '删除',
+    'appointment/ip-manage/index' => 'ip黑名单管理',
+    'operate type ip manage' => 'ip黑名单',
+
 ];

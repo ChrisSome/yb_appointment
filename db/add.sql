@@ -11,4 +11,16 @@ ALTER TABLE `user_appointments` ADD `updated_at` INT UNSIGNED NOT NULL DEFAULT 0
 
 
 
-CREATE USER `native‘@‘localhost‘ IDENTIFIED WITH mysql_native_password BY ‘password!2#4‘;
+
+--
+-- 增加ip黑名单功能
+--
+DROP TABLE IF EXISTS `ip_blacklists`;
+CREATE TABLE IF NOT EXISTS `ip_blacklists`(
+  `id` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT  PRIMARY KEY,
+  `ip_addr` INT NOT NULL UNIQUE KEY,
+  `mgr_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '操作人id',
+  `mgr_name` VARCHAR(32) NOT NULL DEFAULT '' COMMENT '操作人名称',
+  `created_at` int(11) NOT NULL,
+  `updated_at` int(11) NOT NULL
+)ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='操作异常表';

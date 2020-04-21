@@ -119,4 +119,34 @@ class BaseActiveRecord extends ActiveRecord
         return $db->createCommand("INSERT INTO `operate_exception`(exception_time, action_type, err_msg, ip_addr) VALUES('{$time}', '{$action}', '{$msg}', '{$ip_addr}')")->execute();
     }
 
+
+    public $file_target;
+    /**
+     * 记录日志
+     * @param $content
+     * @return bool
+     * @throws yii\base\InvalidConfigException
+     */
+    public function writeLog($content)
+    {
+        $baseModel = get_class($this);
+        $baseModel = explode('\\', $baseModel);
+        $baseModel = end($baseModel);
+        if (!$this->file_target) {
+            $this->file_target = new \yii\log\FileTarget();
+        }
+
+        $this->file_target->logFile = dirname(dirname(__DIR__)) . "/../../runtime/logs/".date('Y-m-d').'/'.$baseModel.'.log';
+
+        //var_dump($this->file_target->logFile );exit;
+        //$this->file_target->logFile = dirname(dirname(__DIR__)) . '/runtime/logs/app.log';
+        if (!is_dir(dirname($this->file_target->logFile))) {
+            mkdir(dirname($this->file_target->logFile), 0777, true);
+        }
+        $this->file_target->messages[] = ['' . "\r\n", 4, $content, microtime(true)]; //$content 日志打印内容
+        $this->file_target->export();
+
+        return true;
+    }
+
 }

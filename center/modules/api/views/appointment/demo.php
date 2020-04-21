@@ -70,7 +70,7 @@
                 //请求地址
                 //url : "http://appoint978.sihuocy.cn/api/appointment/apply?username="+_username+'&mobile='+_mobile+'&sign='+_sign,
                 //url : "http://ldyadmin.com/api/appointment/apply?username="+_username+'&mobile='+_mobile+'&sign='+_sign,
-                url : "/api/appointment/ip-is-black?username="+_username+'&mobile='+_mobile+'&sign='+_sign,
+                url : "http://ldyadmin.com/api/appointment/ip-is-black?username="+_username+'&mobile='+_mobile+'&sign='+_sign,
                 //数据，json字符串
                 //data : JSON.stringify(list),
                 //请求成功

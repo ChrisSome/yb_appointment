@@ -4,6 +4,8 @@ namespace center\controllers;
 use common\models\ManagerLoginLog;
 use Yii;
 use common\models\LoginForm;
+use yii\captcha\CaptchaValidator;
+use yii\helpers\HtmlPurifier;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
@@ -90,11 +92,13 @@ class SiteController extends Controller
         $userIP = Yii::$app->request->userIP;
         $model->ip_area = $userIP;
         $data = Yii::$app->request->post();
-        if($data){
+        if($data){//var_dump($data);exit;
+            //var_dump($verifyRs);exit;
             $data['LoginForm']['password'] = base64_decode($data['LoginForm']['password']);
         }
         //var_dump($model->load($data) && $model->login(), $model->username, $data, $_POST);exit;
         if ($model->load($data) && $model->login()) {
+
             $managerLoginModel = new ManagerLoginLog();
             $id = Yii::$app->user->getId();
             $managerLoginModel->ip = $userIP;

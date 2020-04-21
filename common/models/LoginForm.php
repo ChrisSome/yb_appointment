@@ -4,6 +4,8 @@ namespace common\models;
 use center\modules\auth\models\AuthAssignment;
 use Yii;
 use yii\base\Model;
+use yii\captcha\CaptchaValidator;
+use yii\helpers\HtmlPurifier;
 
 /**
  * Login form
@@ -31,10 +33,20 @@ class LoginForm extends Model
             ['rememberMe', 'boolean'],
             // password is validated by validatePassword()
             ['password', 'validatePassword'],
-            ['verifyCode', 'captcha'],
+            ['verifyCode', 'captchaVerify'],
         ];
     }
 
+    public function captchaVerify($attribute, $params)
+    {
+        $imgVerifyCode = $this->verifyCode;
+        $imgVerifyCode = HtmlPurifier::process($imgVerifyCode);
+        $caprcha = new CaptchaValidator();
+        $verifyRs = $caprcha->validate($imgVerifyCode);
+        if (!$verifyRs) {
+            $this->addError($attribute, '验证码错误');
+        }
+    }
     public function attributeLabels()
     {
         return [

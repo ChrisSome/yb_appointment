@@ -69,7 +69,7 @@ class BaseActiveRecord extends ActiveRecord
      */
     public function init()
     {
-        $this->flag = User::isSuper();
+        //$this->flag = User::isSuper();
         parent::init(); //TODO:: change some settings
     }
 

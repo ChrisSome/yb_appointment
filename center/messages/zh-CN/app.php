@@ -414,5 +414,5 @@ return [
     'appointment/ip-manage/delete' => '删除',
     'appointment/ip-manage/index' => 'ip黑名单管理',
     'operate type ip manage' => 'ip黑名单',
-
+    'appointment/file/index' => '上传文件管理'
 ];

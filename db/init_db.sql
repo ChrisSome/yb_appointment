@@ -162,7 +162,7 @@ CREATE TABLE IF NOT EXISTS `log_operate` (
 DROP TABLE IF EXISTS `import_mobiles`;
 CREATE TABLE IF NOT EXISTS `import_mobiles`(
  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
- `mobile` CHAR(11) NOT NULL DEFAULT '' COMMENT '手机号',
+ `mobile` CHAR(13) NOT NULL DEFAULT '' COMMENT '手机号',
  `import_time` int(11) NOT NULL COMMENT '导入时间',
  `mgr_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '操作人id',
  `mgr_name` VARCHAR(32) NOT NULL DEFAULT '' COMMENT '操作人名称',

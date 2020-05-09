@@ -15,7 +15,7 @@ use yii\helpers\Url;
 $can = Yii::$app->user->can('appointment/user/index');
 $canDelete = Yii::$app->user->can('appointment/user/delete');
 $canAdd = Yii::$app->user->can('appointment/file/add');
-$canOperate = Yii::$app->user->can('appointment/user/operate');
+$canOperate = Yii::$app->user->can('appointment/file/operate');
 $canBatch = Yii::$app->user->can('appointment/user/batch');
 
 $this->title = Yii::t('app', 'appointment/user/index');
@@ -157,6 +157,11 @@ if ($canAdd):
                                 }
 
                                 ?>
+                                <?php if ($canDelete || $canOperate): ?>
+                                    <th nowrap="nowrap">
+                                        <div class="th"><?= Yii::t('app', 'operate') ?></div>
+                                    </th>
+                                <?php endif; ?>
                             </tr>
                             </thead>
                             <tbody>
@@ -184,9 +189,27 @@ if ($canAdd):
                                             }
 
                                             ?>
+
                                         </td>
 
+
                                     <?php endforeach ?>
+                                    <td>
+                                        <?php if ($canDelete || $canOperate): ?>
+                                            <?php if ($canDelete) echo Html::a(Html::button(Yii::t('app', 'delete'), ['class' => 'btn btn-danger btn-xs']), ['delete', 'id' => $one['id']], [
+                                                'title' => Yii::t('app', 'User Delete'),
+                                                'data' => [
+                                                    'method' => 'post',
+                                                    'confirm' => '确定删除此上传数据?'
+                                                ],]) ?>
+                                            <?php if ($canOperate) echo Html::a(Html::button(Yii::t('app', '修改状态'), ['class' => 'btn btn-info btn-xs']), ['operate', 'id' => $one['id']], [
+                                                'title' => Yii::t('app', 'User Delete'),
+                                                'data' => [
+                                                    'method' => 'post',
+                                                    'confirm' => '确定修改状态?'
+                                                ],]) ?>
+                                        <?php endif; ?>
+                                    </td>
                                 </tr>
                             <?php endforeach ?>
                             </tbody>

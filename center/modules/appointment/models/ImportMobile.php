@@ -246,7 +246,7 @@ class ImportMobile extends BaseActiveRecord implements BaseModelInterface
                 $v[0] = isset($v['A']) ? $v['A'] : $v[0];
                 //var_dump($v[0], in_array($v[0], $hasAlreadyImportMobile));exit;
                 if (!in_array($v[0], $hasAlreadyImportMobile)) {
-                    if ($success_num != 0 && $success_num % 1000 == 0) {
+                    if ($success_num != 0 && $success_num % 200 == 0) {
                         Yii::$app->db->createCommand()->batchInsert(self::tableName(), $field, $batch_data)->execute();
                         $batch_data = [];
                     }

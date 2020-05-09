@@ -19,7 +19,7 @@ use yii\helpers\Json;
  */
 class ImportFiles extends BaseActiveRecord implements BaseModelInterface
 {
-    public $default_field = ['id', 'file', 'status', 'result','created_at', 'updated_at'];
+    public $default_field = ['id', 'file', 'status', 'mgr_name','result','created_at', 'updated_at'];
 
 
     public function beforeSave($insert)
@@ -83,6 +83,7 @@ class ImportFiles extends BaseActiveRecord implements BaseModelInterface
             'updated_at' => '最后更新时间',
             'start_time' => '最后更新时间',
             'stop_time' => '最后更新时间',
+            'mgr_name' => '操作员',
         ];
     }
 

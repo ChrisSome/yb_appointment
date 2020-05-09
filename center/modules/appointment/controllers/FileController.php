@@ -88,11 +88,13 @@ class FileController extends ValidateController
      */
     public function actionDelete($id)
     {
-        $model = UserAppointment::findOne($id);
-        if (!$model) {
-            Yii::$app->getSession()->setFlash('success', '对象不存在');
+        $model = ImportFiles::findOne($id);
+        if (!$model || $model->status == 2) {
+            Yii::$app->getSession()->setFlash('error', '对象不存在或者正在进行中');
         } else {
+            $file = $model->file;
             if ($model->delete()) {
+                @unlink($file);
                 Yii::$app->getSession()->setFlash('success', '删除号码成功');
             } else {
                 Yii::$app->getSession()->setFlash('success', '删除号码失败');
@@ -102,6 +104,33 @@ class FileController extends ValidateController
         return $this->redirect('index');
     }
 
+    /**
+     * 操作
+     * @param $id
+     * @return string|\yii\web\Response
+     */
+    public function actionOperate($id)
+    {
+        $model = ImportFiles::findOne($id);
+        if (!$model) {
+            Yii::$app->getSession()->setFlash('success', '对象不存在');
+
+            return $this->redirect('index');
+        }
+        if (Yii::$app->request->isPost) {
+            $model->status = $model->status == 2 ? 3 : 1;
+            if ($model->save(false)) {
+                Yii::$app->getSession()->setFlash('success', '操作成功');
+            } else {
+                var_dump($model->getErrors());EXIT;
+                Yii::$app->getSession()->setFlash('success', '操作失败');
+            }
+
+            return $this->redirect('index');
+        } else {
+            return $this->renderAjax('reason');
+        }
+    }
     /**
      * 查看
      * @param $id

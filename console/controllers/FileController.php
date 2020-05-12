@@ -16,8 +16,9 @@ class FileController extends Controller
 {
     public function actionIndex()
     {
+        ini_set('memory_limit', '2048M');
         $query = new Query();
-        $files = $query->where(['status' => [0, 2, 3]])
+        $files = $query->where(['status' => [0, 3]])
             ->from('upload_files')
             ->all();
         $db = Yii::$app->db;
@@ -31,8 +32,8 @@ class FileController extends Controller
                 $db->createCommand()->update('upload_files', ['status' => 1, 'result' => $rs['msg'], 'updated_at' => time()], ['id' => $file['id']])->execute();
                 echo "{$file['file']} end exec\r\n";
 
-                return  ;
             }
+            return ;
         } catch (\Exception $e) {
             if (!empty($ids)) {
                 var_dump($e->getMessage());

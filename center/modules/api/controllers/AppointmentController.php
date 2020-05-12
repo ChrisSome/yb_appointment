@@ -5,7 +5,7 @@ namespace center\modules\api\controllers;
 
 use center\modules\appointment\models\DomainManager;
 use center\modules\appointment\models\IpBlacklist;
-use center\modules\appointment\models\UserAppointments;
+use center\modules\appointment\models\SmsHistory;
 use Yii;
 use common\models\Redis;
 use center\controllers\ApiController;
@@ -79,7 +79,14 @@ class AppointmentController extends ApiController
             ]);
         }
 
-        if (!$this->checkSign($params, true)) {
+        if (!isset($params['code'])) {
+            return self::returnJson(400, [
+                'code' => 400,
+                'message' => '验证码不能为空'
+            ]);
+        }
+
+        if (!$this->checkSign($params, true) && false) {
             return self::returnJson(408, [
                 'code' => 408,
                 'message' => '验签不通过'
@@ -111,8 +118,26 @@ class AppointmentController extends ApiController
                 'message' => '很抱歉， 您已预约'
             ]);
         } else {
+            //增加验证码验证逻辑
+            $lastCodes = SmsHistory::find()->where(['phone' => $sPhone, 'type' => 1])->orderBy(['id' =>  SORT_DESC])->limit(1)->one();
+           /* $sql = SmsHistory::find()->where(['phone' => $sPhone])->orderBy(['id' =>  SORT_DESC])->limit(1)->createCommand()->getRawSql();
+            var_dump($lastCodes->content, $sql);*/
+            if ($lastCodes->content != $params['code']) {
+                return self::returnJson(408, [
+                    'code' => 408,
+                    'message' => '很抱歉，验证码错误'
+                ]);
+            }
+            if ($lastCodes->status != 0) {
+                return self::returnJson(408, [
+                    'code' => 408,
+                    'message' => '该验证码已使用， 不可重复使用'
+                ]);
+            }
             //echo 1;exit;
             $model->save();
+            $lastCodes->status = 1;
+            $lastCodes->save(false);
 
             //echo 1;exit;
             return self::returnJson(200, [

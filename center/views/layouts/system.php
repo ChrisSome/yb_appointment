@@ -12,7 +12,7 @@ AppAsset::register($this);
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <link rel="stylesheet" href="/styles/bootstrap.min.css"/>
-    <script src="/lib/echarts/build/dist/echarts3.js"></script>
+    <script src="/common/lib/echarts/build/dist/echarts3.js"></script>
 </head>
 <style>
 </style>

@@ -49,7 +49,8 @@ return [
                     'appointment/ip-manage/update',
                     'appointment/ip-manage/delete',
                 ],
-                'appointment/file/index'
+                'appointment/file/index',
+                'appointment/sms/index'
             ],
         ],
         //设置

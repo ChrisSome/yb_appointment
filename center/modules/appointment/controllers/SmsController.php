@@ -8,9 +8,8 @@ use center\modules\appointment\models\SmsHistory;
 use Yii;
 use center\models\Pagination;
 use center\controllers\ValidateController;
-use center\modules\appointment\models\UserAppointment;
 
-class UserController extends ValidateController
+class SmsController extends ValidateController
 {
     /**
      * 预约首页
@@ -18,10 +17,10 @@ class UserController extends ValidateController
      */
     public function actionIndex()
     {
-        $model = new UserAppointment();
+        $model = new SmsHistory();
         $params = Yii::$app->request->queryParams;
         $params['showField'] = $model->default_field;
-        $query = UserAppointment::find();
+        $query = SmsHistory::find();
         $pagesSize = isset($params['offset']) ? ($params['offset'] ? $params['offset'] : 20) : 20; // 每页条数
         foreach ($params as $k => $v) {
             if ((!empty($v) || preg_match('/^0$/', $v)) &&  array_key_exists($k, $model->getSearchField())) {
@@ -31,6 +30,9 @@ class UserController extends ValidateController
                         break;
                     case 'stop_time':
                         $query->andWhere('created_at <= :end', [':end' => strtotime($v)]);
+                        break;
+                    case 'ip_addr':
+                        $query->andWhere(['ip_addr' => ip2long($v)]);
                         break;
                     default:
                         $query->andWhere([$k => $v]);
@@ -47,21 +49,6 @@ class UserController extends ValidateController
             $query->orderBy(['id' => SORT_DESC]);
         }
 
-        if (isset($params['export'])) {
-            if ($query->count() > 10000) {
-                Yii::$app->getSession()->setFlash('error', '导出数据过多，建议分批次导出');
-
-                return $this->redirect('index');
-            }
-
-            if (!$query->count()) {
-                Yii::$app->getSession()->setFlash('error', '没有要导出的数据');
-
-                return $this->redirect('index');
-            }
-            $model->exportData($query);
-            exit;
-        }
         $pagination = new Pagination([
             'totalCount' => $query->count(),
             'pageSize' => $pagesSize
@@ -70,6 +57,7 @@ class UserController extends ValidateController
             ->limit($pagination->limit)
             ->asArray()
             ->all();
+
 
 
         return $this->render('index', [
@@ -86,7 +74,7 @@ class UserController extends ValidateController
      */
     public function actionDelete($id)
     {
-        $model = UserAppointment::findOne($id);
+        $model = SmsHistory::findOne($id);
         if (!$model) {
             Yii::$app->getSession()->setFlash('success', '对象不存在');
         } else {
@@ -106,7 +94,7 @@ class UserController extends ValidateController
      * @return string|\yii\web\Response
      */
     public function actionView($id) {
-        $model = UserAppointment::findOne($id);
+        $model = SmsHistory::findOne($id);
         if (!$model) {
             Yii::$app->getSession()->setFlash('success', '对象不存在');
 
@@ -127,7 +115,7 @@ class UserController extends ValidateController
      */
     public function actionOperate($id)
     {
-        $model = UserAppointment::findOne($id);
+        $model = SmsHistory::findOne($id);
         $iChgStatus = Yii::$app->request->get('status');
         $sRemark = Yii::$app->request->get('remark', '');
         if (!$model) {
@@ -166,9 +154,9 @@ class UserController extends ValidateController
         $id_arr = explode(',', $ids);
         $status = $params['status'];
         $remark = $params['remark'];
-        $model = new UserAppointment();
+        $model = new SmsHistory();
         $rs = Yii::$app->db->createCommand()->update(
-            UserAppointment::tableName(),
+            SmsHistory::tableName(),
             ['status' => $status, 'remark' => $remark, 'updated_at' => time(), 'operator' => $model->getMgrName()],
             ['id' => $id_arr]
         )->execute();
@@ -191,7 +179,7 @@ class UserController extends ValidateController
      */
     public function actionNotice($id)
     {
-        $model = UserAppointment::findOne($id);
+        $model = SmsHistory::findOne($id);
         if (!$model || $model->status != 1) {
             Yii::$app->getSession()->setFlash('success', '对象不存在或者未通过状态不允许通知');
 

@@ -10,7 +10,11 @@ ALTER TABLE `user_appointments` ADD `operator` VARCHAR(64)  NOT NULL DEFAULT '' 
 ALTER TABLE `user_appointments` ADD `updated_at` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '更新时间' AFTER `created_at`;
 
 
-
+--
+-- 去除唯一索引
+--
+ALTER TABLE `import_mobiles` drop key `mobile`;
+alter table `import_mobiles` add key `mobile`(`mobile`);
 
 --
 -- 增加ip黑名单功能
@@ -37,3 +41,22 @@ CREATE TABLE IF NOT EXISTS `upload_files`(
     `created_at` int(11) NOT NULL,
     `updated_at` int(11) NOT NULL
 )ENGINE=Innodb DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='增加上传记录表';
+
+
+
+# 创建短信记录表
+DROP TABLE IF EXISTS `sms_history`;
+CREATE TABLE IF NOT EXISTS `sms_history`(
+    id INT UNSIGNED  AUTO_INCREMENT  PRIMARY KEY,
+    `phone` char(13) not null comment '手机号',
+    `content` VARCHAR(255) NOT NULL DEFAULT "" COMMENT '发送内容',
+    `mgr_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '操作人id',
+    `mgr_name` VARCHAR(32) NOT NULL DEFAULT '' COMMENT '操作人名称',
+    `sender_id` VARCHAR(128) NOT NULL COMMENT '三方id',
+    `ip_addr` CHAR(15) NOT NULL DEFAULT  '' COMMENT '操作ip',
+    `status` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否使用',
+    `type` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '1验证码2短信',
+    `created_at` int(11) NOT NULL,
+    INDEX `phone`(`phone`),
+    INDEX `ip`(`ip_addr`)
+)ENGINE=Innodb DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='短信记录表';

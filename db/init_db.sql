@@ -184,6 +184,8 @@ CREATE TABLE IF NOT EXISTS `user_appointments`(
  UNIQUE KEY `mobile`(`mobile`)
 )ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 COMMENT='手机号码预约表';
 
+# 增加是否通知字段
+ALTER TABLE user_appointments ADD `is_notice` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否通知' AFTER `ip`;
 
 --
 -- 操作异常表

@@ -27,7 +27,7 @@ use yii\helpers\Json;
 class UserAppointment extends BaseActiveRecord implements BaseModelInterface
 {
     public static $appointment_phones = "list:appointment:phones";
-    public $default_field = ['id', 'username' ,'mobile', 'status', 'remark', 'operator' ,'created_at', 'updated_at','ip'];
+    public $default_field = ['id', 'username' ,'mobile', 'status', 'remark', 'operator' ,'created_at', 'updated_at','ip', 'is_notice'];
     public $_temOldAttr;
 
     public function beforeSave($insert)
@@ -79,7 +79,8 @@ class UserAppointment extends BaseActiveRecord implements BaseModelInterface
             'ip' => 'ip地址',
             'status' => '状态',
             'remark' => '备注',
-            'operator' => '操作员'
+            'operator' => '操作员',
+            'is_notice' => '是否通知'
         ];
     }
 
@@ -103,7 +104,8 @@ class UserAppointment extends BaseActiveRecord implements BaseModelInterface
             'status' => '状态',
             'updated_at' => '最后更新时间',
             'operator' => '操作员',
-            'remark' => '备注'
+            'remark' => '备注',
+            'is_notice' => '是否通知'
         ];
 
         return $this->_searchField;
@@ -134,6 +136,14 @@ class UserAppointment extends BaseActiveRecord implements BaseModelInterface
                     0 => '待审核',
                     1 => '已通过',
                     2 => '已拒绝',
+                ]
+            ],
+            'is_notice' => [
+                'label' => Yii::t('app', '石头通知'),
+                'list' => [
+                    '' => '请选择',
+                    0 => '未通知',
+                    1 => '已通知',
                 ]
             ],
             'username' => [

@@ -51,6 +51,7 @@ class ApiController extends Controller
         }
 
         $sSafeStr = rtrim($sSafeStr, '&');
+        //var_dump(md5($sSafeStr));
 
         return $checked ? md5($sSafeStr) == $params[$this->sign_key] : md5($sSafeStr);
     }

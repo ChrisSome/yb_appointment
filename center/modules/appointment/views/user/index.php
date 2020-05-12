@@ -156,6 +156,8 @@ $attributes = $model->getAttributesList();
                                             } else if ($value == 'status') {
                                                 $available_css = $one['status'] == 1 ? 'btn-success' : ($one[$value] == 2 ? 'btn-danger' : 'btn-xs');
                                                 echo '<button type="button" class="btn ' . $available_css . ' btn-xs">' . $attributes['status'][$one['status']] . '</button>';
+                                            } else if ($value == 'is_notice') {
+                                                echo $one[$value] == 0 ? '否' : '是';
                                             } else {
                                                 echo Html::encode($one[$value]);
                                             }
@@ -208,6 +210,15 @@ $attributes = $model->getAttributesList();
                                                         ]);
                                                 } else {
                                                     //成功
+                                                    echo Html::a(Html::button(Yii::t('app', ' 通知用户'), ['class' => 'btn btn-warning btn-xs']),
+                                                        ['notice', 'id' => $one['id']], [
+                                                            'title' => Yii::t('app', '通过'),
+                                                            'data' => [
+                                                                'method' => 'post',
+                                                                'confirm' => Yii::t('app', '确定发短信通知用户么？'),
+                                                            ],
+
+                                                        ]);
                                                 }
 
                                             } ?>

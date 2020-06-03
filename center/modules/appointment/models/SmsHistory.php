@@ -258,7 +258,7 @@ class SmsHistory extends \center\modules\Core\models\BaseActiveRecord implements
             $aContent = [
                 'phone' => $this->phone,
                 'content' => $code,
-                'sender_id' => $xsend['send_id'],
+                'sender_id' => $xsend['msgid'],
                 'ip_addr' => $ip,
                 'mgr_name' => 'SYSTEM'
             ];

@@ -235,7 +235,7 @@ class SmsHistory extends \center\modules\Core\models\BaseActiveRecord implements
 
         $misaoSaiVovice = new \miaosaicode();
         $code = $this->generateCode();
-        $content = '尊敬的用户，非常荣幸您刚刚在我们的网页预约了注册领取现金的活动，验证码是' . $code;
+        $content = '尊敬的用户，您的验证码是' . $code;
         $content = str_repeat($content, 3);
         $xsend = $misaoSaiVovice->send($this->phone, $content, time(), $misaoSaiVovice::STATE_VOICE);
 

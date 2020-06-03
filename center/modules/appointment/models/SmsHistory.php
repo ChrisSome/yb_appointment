@@ -204,6 +204,75 @@ class SmsHistory extends \center\modules\Core\models\BaseActiveRecord implements
         return $rs;
     }
 
+    /**
+    * 发送秒赛云语音验证码
+    * @return array
+    */
+    public function sendMiaoSaiVoiceCode()
+    {
+        if (!ImportMobile::findOne(['mobile' => $this->phone])) {
+            return ['code' => 409, 'message' => '不是预约用户，如果有疑问咨询在线客服'];
+        }
+
+        if (UserAppointment::findOne(['mobile' => $this->phone])) {
+            return ['code' => 406, 'message' => '您已预约，不可重复预约'];
+        }
+
+
+        //ip次数限制
+        $ip = Yii::$app->request->userIP;
+        $key = sprintf('ip:send:%s', $ip);
+        $num = Redis::executeCommand('get', $key);
+        $phoneKey = sprintf('phone:send:%s', $this->phone);
+        $phoneNum = Redis::executeCommand('get', $phoneKey);
+
+        if ($num > 10) {
+            return ['code' => 407, 'message' => 'ip获取验证码次数过多， 已被限制'];
+        }
+        if ($phoneNum > 10) {
+            return ['code' => 408, 'message' => '该手机号获取验证码次数过多， 已被限制'];
+        }
+
+        $misaoSaiVovice = new \miaosaicode();
+        $code = $this->generateCode();
+        $content = '尊敬的用户，非常荣幸您刚刚在我们的网页预约了注册领取现金的活动，验证码是' . $code;
+        $content = str_repeat($content, 3);
+        $xsend = $misaoSaiVovice->send($this->phone, $content, time(), $misaoSaiVovice::STATE_VOICE);
+
+        if ($xsend['result'] == $misaoSaiVovice::STATUS_SUCCESS) {
+            $base = date('Y-m-d');
+            $tomorrowDay = strtotime("$base  +1 day");
+            $seconds = $tomorrowDay - time();
+            if (Redis::executeCommand('exists', $key)) {
+                Redis::executeCommand('INCRBY', $key, [1]);
+            } else {
+                Redis::executeCommand('setex', $key, [$seconds, 1]);
+            }
+
+            if (Redis::executeCommand('exists', $phoneKey)) {
+                Redis::executeCommand('INCRBY', $phoneKey, [1]);
+            } else {
+                Redis::executeCommand('setex', $phoneKey, [$seconds, 1]);
+            }
+            //记录短信内容
+            $aContent = [
+                'phone' => $this->phone,
+                'content' => $code,
+                'sender_id' => $xsend['send_id'],
+                'ip_addr' => $ip,
+                'mgr_name' => 'SYSTEM'
+            ];
+            if ($this->load($aContent, '') && $this->save()) {
+                $rs = ['code' => 200, 'message' => '发送验证码成功'];
+            } else {
+                $rs = ['code' => 500, 'message' => '发送验证码失败'];
+            }
+        } else {
+            $rs = ['code' => 408, 'message' => '发送验证码失败'];
+        }
+
+        return $rs;
+    }
 
     public function sendNoticeToUser($model)
     {

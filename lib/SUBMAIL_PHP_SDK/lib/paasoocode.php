@@ -2,7 +2,7 @@
 
 class paasoocode{
 
-    const STATUS_SUCCESS = 0;   //发送成功
+    const STATUS_SUCCESS = "0";   //发送成功
 
     const STATE_CODE    = 1;    //验证码短信
     const STATE_MARKING = 2;    //营销短信
@@ -12,20 +12,23 @@ class paasoocode{
 
 
     private $url = 'https://api.paasoo.cn/voice?key=%s&secret=%s&from=85299998888&to=%s&lang=zh-cn&text=%s&repeat=%s';              //语音地址
-    private $codeUrl = 'https://api.paasoo.cn/json?key=ybqxenxy&secret=bBn2ebt3&from=132432&to=8615670660962&text=Hello+world';    //短息地址
-    private $accountUser = '13222930591';           //账户名
-    private $accountpass = '3388858123Qwer.';       //账户密码
+    private $codeUrl = 'https://api.paasoo.com/json?key=%s&secret=%s&from=sdfknsdf&to=%s&text=%s';    //短息地址
     public  $maxCount = 100;                        //每日最大发送量，后续验证
 
-    private $API_KEY    = 'ybqxenxy';
-    private $API_SERECT = 'bBn2ebt3';
+    private $API_KEY    = 'ybqxenxy';               //语音
+    private $API_KEY_MESS = 'taihv6tw';             //短信
+
+    private $API_SERECT = 'bBn2ebt3';               //语音
+    private $API_SERECT_MESS = 'vvd4gWnb';          //短信
+
+    public $copying = '【新明珠三国】尊敬的用户，您好，您本次的验证码是: %s';     //短信模板
 
 
 
 
-    private function curlpost($url,$data,$method = 'GET',$type='json',$headers=[])
+
+    private function curlpost($url)
     {
-
 
 
         $ch = curl_init();
@@ -51,7 +54,7 @@ class paasoocode{
      * @param $url
      * @return mixed
      */
-    public function get($url)
+    public function curlget($url)
     {
         //发送请求
         $curl = curl_init();
@@ -64,6 +67,7 @@ class paasoocode{
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
         //curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
         $result = curl_exec($curl);
         curl_close($curl);
 
@@ -72,22 +76,18 @@ class paasoocode{
 
     }
 
-    //$account 用户账号
+    /**
+     * 发送短信验证码
+     * @param $mobile
+     * @param $content
+     * @return mixed
+     */
 
-    public function send($mobile,$msg, $repeatNum){
-        $url = sprintf($this->codeUrl, $this->API_KEY, $this->API_SERECT, $mobile, $msg, $repeatNum);
-
-var_dump($url);die;
-
-        $huawei_res = $this->curlpost($url,'');var_dump($huawei_res);die;
-        $huawei_res = json_decode($huawei_res,true);
+    public function sendMess($mobile,$content){
+        $url = sprintf($this->codeUrl, $this->API_KEY_MESS, $this->API_SERECT_MESS, $mobile, urlencode($content));
+        $huawei_res = $this->curlget($url);
         return $huawei_res ;
 
     }
 
 }
-
-$paasoo = new paasoocode();
-//$res = $paasoo->send('15670660962', '验证码123123', 3);
-$res = $paasoo->get();
-var_dump($res);

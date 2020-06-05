@@ -143,7 +143,11 @@ $this->title = Yii::t('app', 'appointment/ip-manage/index');
                                             } else if ($value == 'status') {
                                                 $one[$value] = $one[$value] == 1 ? '已使用' : '未使用';
                                             } else if ($value == 'ip_addr') {
-                                                $one[$value] = long2ip($one[$value]);
+                                                if ($one[$value] == '') {
+                                                    $one[$value] = '未知';
+                                                } else {
+                                                    $one[$value] = long2ip($one[$value]);
+                                                }
                                             }
                                             echo Html::encode($one[$value]);
                                             ?>

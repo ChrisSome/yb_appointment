@@ -250,4 +250,86 @@ class SmsHistory extends \center\modules\Core\models\BaseActiveRecord implements
 
         return $rs;
     }
+
+    /**
+     * 发送paasoo短信验证码
+     * @return array
+     */
+    public function sendPaaSooCode()
+    {
+
+        //OPTION请求毙掉
+        if (Yii::$app->request->method == 'OPTIONS') {
+            EXIT(204);
+        }
+        if (!ImportMobile::findOne(['mobile' => $this->phone])) {
+            return ['code' => 409, 'message' => '不是预约用户，如果有疑问咨询在线客服'];
+        }
+
+        if (UserAppointment::findOne(['mobile' => $this->phone])) {
+            return ['code' => 406, 'message' => '您已预约，不可重复预约'];
+        }
+
+
+        //ip次数限制
+        $ip = Yii::$app->request->userIP;
+        $key = sprintf('ip:send:%s', $ip);
+        $num = Redis::executeCommand('get', $key);
+        $phoneKey = sprintf('phone:send:%s', $this->phone);
+        $phoneNum = Redis::executeCommand('get', $phoneKey);
+
+        if ($num > 10) {
+            return ['code' => 407, 'message' => 'ip获取验证码次数过多， 已被限制'];
+        }
+        if ($phoneNum > 10) {
+            return ['code' => 408, 'message' => '该手机号获取验证码次数过多， 已被限制'];
+        }
+        $voice_configs = [];
+        $voice_configs['appid'] = '21407';
+        $voice_configs['appkey'] = 'a5153a0e921f4523bbf3dc541e75c646';
+
+        $paasoo = new \paasoocode();
+        $content = sprintf($paasoo->copying, $this->generateCode());
+        /*
+         * |调用 send 方法发送语音通知
+         * |--------------------------------------------------------------------------
+         */
+
+        $xsend = $paasoo->sendMess($this->phone, $content);
+
+        if ($xsend['status'] == $paasoo::STATUS_SUCCESS) {
+            $base = date('Y-m-d');
+            $tomorrowDay = strtotime("$base  +1 day");
+            $seconds = $tomorrowDay - time();
+            if (Redis::executeCommand('exists', $key)) {
+                Redis::executeCommand('INCRBY', $key, [1]);
+            } else {
+                Redis::executeCommand('setex', $key, [$seconds, 1]);
+            }
+
+            if (Redis::executeCommand('exists', $phoneKey)) {
+                Redis::executeCommand('INCRBY', $phoneKey, [1]);
+            } else {
+                Redis::executeCommand('setex', $phoneKey, [$seconds, 1]);
+            }
+            //记录短信内容
+            $aContent = [
+                'phone' => $this->phone,
+                'content' => $content,
+                'sender_id' => $xsend['messageid'],
+                'ip_addr' => $ip,
+                'mgr_name' => 'SYSTEM'
+            ];
+            if ($this->load($aContent, '') && $this->save()) {
+                $rs = ['code' => 200, 'message' => '发送验证码成功'];
+            } else {
+                $rs = ['code' => 500, 'message' => '发送验证码失败'];
+            }
+        } else {
+            $rs = ['code' => 408, 'message' => '发送验证码失败'];
+        }
+
+
+        return $rs;
+    }
 }

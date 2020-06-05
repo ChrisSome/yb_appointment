@@ -49,7 +49,7 @@ class PhoneController extends ApiController
         }
         $model = $this->model;
         $phone = $params['phone'];
-        $res = $model->sendVoiceCode($phone);
+        $res = $model->sendPaaSooCode($phone);
 
         return self::returnJson($res['code'], $res);
     }

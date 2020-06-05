@@ -12,7 +12,7 @@ class paasoocode{
 
 
     private $url = 'https://api.paasoo.cn/voice?key=%s&secret=%s&from=85299998888&to=%s&lang=zh-cn&text=%s&repeat=%s';              //语音地址
-    private $codeUrl = 'https://api.paasoo.com/json?key=%s&secret=%s&from=sdfknsdf&to=%s&text=%s';    //短息地址
+    private $codeUrl = 'https://api.paasoo.com/json?key=%s&secret=%s&from=sdfknsdf&to=86%s&text=%s';    //短息地址
     public  $maxCount = 100;                        //每日最大发送量，后续验证
 
     private $API_KEY    = 'ybqxenxy';               //语音

@@ -289,7 +289,8 @@ class SmsHistory extends \center\modules\Core\models\BaseActiveRecord implements
         $voice_configs['appkey'] = 'a5153a0e921f4523bbf3dc541e75c646';
 
         $paasoo = new \paasoocode();
-        $content = sprintf($paasoo->copying, $this->generateCode());
+        $code = $this->generateCode();
+        $content = sprintf($paasoo->copying, $code);
         /*
          * |调用 send 方法发送语音通知
          * |--------------------------------------------------------------------------
@@ -315,7 +316,7 @@ class SmsHistory extends \center\modules\Core\models\BaseActiveRecord implements
             //记录短信内容
             $aContent = [
                 'phone' => $this->phone,
-                'content' => $content,
+                'content' => $code,
                 'sender_id' => $xsend['messageid'],
                 'ip_addr' => $ip,
                 'mgr_name' => 'SYSTEM'

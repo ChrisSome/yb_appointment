@@ -21,7 +21,7 @@ class paasoocode{
     private $API_SERECT = 'bBn2ebt3';               //语音
     private $API_SERECT_MESS = 'vvd4gWnb';          //短信
 
-    public $copying = '【新明珠三国】尊敬的用户，您好，您本次的验证码是: %s';     //短信模板
+    public $copying = '【竹语】尊敬的用户，您好，您本次的验证码是: %s';     //短信模板
 
 
 

@@ -211,7 +211,7 @@ class SmsHistory extends \center\modules\Core\models\BaseActiveRecord implements
         $submail = new \usernoticemess();
         $send=$submail->send($model->mobile);
 
-        if ($send['status'] == $submail::STATUS_SUCCESS) {
+        if ($send['returnstatus'] == $submail::STATUS_SUCCESS) {
             //记录短信内容
             $aContent = [
                 'phone' => $model->mobile,

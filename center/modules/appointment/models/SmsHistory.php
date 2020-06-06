@@ -208,29 +208,15 @@ class SmsHistory extends \center\modules\Core\models\BaseActiveRecord implements
     public function sendNoticeToUser($model)
     {
 
-        $message_configs['appid']='49583';
-        $message_configs['appkey']='7dca74e2b2112dfb751f0fba70d4dcd5';
-        $message_configs['sign_type']='normal';
-        $message_configs['server']='http://api.mysubmail.com/';
-        $submail=new MESSAGEsend($message_configs);
+        $submail = new \usernoticemess();
+        $send=$submail->send($model->mobile);
 
-        /*
-         |必选参数
-         |--------------------------------------------------------------------------
-         |设置短信接收的11位手机号码
-         |--------------------------------------------------------------------------
-         */
-        $submail->setTo($model->mobile);
-        $content = "【夜猫体育】恭喜您，您注册预约的金额已到账，请登录查收。";
-        $submail->SetContent($content);
-        $send=$submail->send();
-
-        if ($send['status'] == 'success') {
+        if ($send['status'] == $submail::STATUS_SUCCESS) {
             //记录短信内容
             $aContent = [
                 'phone' => $model->mobile,
-                'content' => $content,
-                'sender_id' => $send['send_id'],
+                'content' => $submail->copying,
+                'sender_id' => $send['taskID'],
                 'ip_addr' => Yii::$app->request->userIP,
                 'mgr_name' => $this->getMgrName(),
                 'type' => 2,

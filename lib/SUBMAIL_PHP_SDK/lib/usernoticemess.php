@@ -67,10 +67,3 @@ class usernoticemess{
     }
 
 }
-
-
-$send = new usernoticemess();
-
-$re = $send->send('15670660962');
-
-print_r($re);

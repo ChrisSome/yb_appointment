@@ -79,12 +79,12 @@ class AppointmentController extends ApiController
             ]);
         }
 
-        if (!isset($params['code'])) {
-            return self::returnJson(400, [
-                'code' => 400,
-                'message' => '验证码不能为空'
-            ]);
-        }
+//        if (!isset($params['code'])) {
+//            return self::returnJson(400, [
+//                'code' => 400,
+//                'message' => '验证码不能为空'
+//            ]);
+//        }
 
         if (!$this->checkSign($params, true) && false) {
             return self::returnJson(408, [
